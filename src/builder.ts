@@ -79,7 +79,7 @@ export async function buildJDK(
     }
   } else {
     if (`${impl}` === 'hotspot' || `${impl}` === 'dcevm') {
-      configureArgs = "--disable-ccache --enable-dtrace=auto --disable-warnings-as-errors"
+      configureArgs = "--disable-ccache"
     } else {
       configureArgs = "--with-freemarker-jar='c:/freemarker.jar' --with-openssl='c:/OpenSSL-1.1.1g-x86_64-VS2017' --enable-openssl-bundling --enable-cuda -with-cuda='C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v9.0'"
     }
