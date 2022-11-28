@@ -8,7 +8,11 @@
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -48,7 +52,7 @@ function run() {
             yield builder.buildJDK(javaToBuild, impl, dcevm_branch, dcevm_tag, usePRRef);
         }
         catch (error) {
-            core.setFailed(error.message);
+            core.setFailed(`${error}`);
         }
     });
 }
@@ -64,7 +68,11 @@ run();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -192,7 +200,7 @@ function buildJDK(javaToBuild, impl, dcevm_branch, dcevm_tag, usePRRef) {
             core.setOutput('JdkPackageFileName', `${fullFileName}`);
         }
         catch (error) {
-            core.setFailed(`build failed and ${error.message}`);
+            core.setFailed(`build failed and ${error}`);
         }
     });
 }
@@ -380,9 +388,14 @@ function getBootJdk(bootJDKVersion, impl) {
         }
         else {
             //TODO : need to update for jdk8
-            const jdk8Jar = yield tc.downloadTool('https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?os=mac&release=latest&arch=x64&heap_size=normal&type=jdk&openjdk_impl=hotspot');
-            yield exec.exec(`sudo tar -xzf ${jdk8Jar} -C ./jdk/home --strip=3`);
-            yield io.rmRF(`${jdk8Jar}`);
+            let bootjdkJar = yield tc.downloadTool('https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?os=windows&release=latest&arch=x64&heap_size=normal&type=jdk&openjdk_impl=hotspot');
+            const tempDir = path.join(tempDirectory, 'temp_' + Math.floor(Math.random() * 2000000000));
+            yield tc.extractZip(bootjdkJar, `${tempDir}`);
+            const tempJDKDir = path.join(tempDir, fs.readdirSync(tempDir)[0]);
+            process.chdir('c:\\');
+            yield io.mkdirP('jdkboot');
+            yield exec.exec(`mv ${tempJDKDir}/* c:\\jdkboot`);
+            process.chdir(`${workDir}`);
         }
         if (IS_WINDOWS) {
             return 'c:/jdkboot';

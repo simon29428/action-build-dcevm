@@ -107,7 +107,7 @@ export async function buildJDK(
     await exec.exec(`find ./ -name ${fullFileName}`)
     core.setOutput('JdkPackageFileName', `${fullFileName}`)
   } catch (error) {
-    core.setFailed(`build failed and ${error.message}`)
+    core.setFailed(`build failed and ${error}`)
   }
 }
 
@@ -299,9 +299,14 @@ async function getBootJdk(bootJDKVersion: string, impl: string): Promise<string>
     await io.rmRF(`${bootjdkJar}`)
   } else {
     //TODO : need to update for jdk8
-    const jdk8Jar = await tc.downloadTool('https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?os=mac&release=latest&arch=x64&heap_size=normal&type=jdk&openjdk_impl=hotspot')
-    await exec.exec(`sudo tar -xzf ${jdk8Jar} -C ./jdk/home --strip=3`)
-    await io.rmRF(`${jdk8Jar}`)
+    let bootjdkJar = await tc.downloadTool('https://api.adoptopenjdk.net/v2/binary/releases/openjdk8?os=windows&release=latest&arch=x64&heap_size=normal&type=jdk&openjdk_impl=hotspot')
+    const tempDir = path.join(tempDirectory, 'temp_' + Math.floor(Math.random() * 2000000000))
+    await tc.extractZip(bootjdkJar, `${tempDir}`)
+    const tempJDKDir = path.join(tempDir, fs.readdirSync(tempDir)[0])
+    process.chdir('c:\\')
+    await io.mkdirP('jdkboot')
+    await exec.exec(`mv ${tempJDKDir}/* c:\\jdkboot`)
+    process.chdir(`${workDir}`)
   }
 
   if (IS_WINDOWS) {

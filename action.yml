@@ -22,5 +22,5 @@ outputs:
   JdkPackageFileName:
     description: 'output package filename in workspace/artifacts directory'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'

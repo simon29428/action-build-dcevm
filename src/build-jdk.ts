@@ -10,7 +10,7 @@ async function run(): Promise<void> {
     const usePRRef = core.getInput('usePRRef') === 'true'
     await builder.buildJDK(javaToBuild, impl, dcevm_branch, dcevm_tag, usePRRef)
   } catch (error) {
-    core.setFailed(error.message)
+    core.setFailed(`${error}`)
   }
 }
 
